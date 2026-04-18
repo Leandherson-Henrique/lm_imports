@@ -42,7 +42,7 @@
         .wpp-floating { position: fixed; bottom: 30px; right: 30px; background: var(--primary); color: white; width: 65px; height: 65px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 32px; z-index: 900; animation: pulse-wpp 2s infinite; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
-        .modal-content { background: white; padding: 35px; border-radius: 30px; width: 95%; max-width: 500px; }
+        .modal-content { background: white; padding: 35px; border-radius: 30px; width: 95%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
         input, textarea { width: 100%; padding: 15px; margin: 10px 0 20px; border: 2px solid var(--soft-grey); border-radius: 15px; font-size: 1rem; }
 
         @media (min-width: 768px) { #products-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); } }
@@ -65,10 +65,15 @@
         <form id="productForm">
             <input type="text" id="pName" placeholder="Nome do Produto" required>
             <input type="text" id="pPrice" placeholder="Preço (ex: R$ 150,00)" required>
-            <input type="text" id="pImg" placeholder="Link da Imagem (Imgur, etc)" required>
-            <textarea id="pDesc" rows="4" placeholder="Descrição..."></textarea>
-            <button type="submit" id="submitBtn" class="btn btn-wa" style="width:100%;">Publicar</button>
-            <button type="button" onclick="closeModal()" style="width:100%; margin-top:10px; border:none; background:none; color:#999;">Cancelar</button>
+            
+            <label style="font-size: 0.8rem; color: #666; font-weight: bold;">Foto do Produto:</label>
+            <input type="file" id="pImgFile" accept="image/*" required>
+            
+            <textarea id="pDesc" rows="4" placeholder="Descrição detalhada..."></textarea>
+            <div id="uploadStatus" style="text-align:center; color: var(--primary); font-weight: bold; margin-bottom: 10px;"></div>
+            
+            <button type="submit" id="submitBtn" class="btn btn-wa" style="width:100%;">Publicar na Vitrine</button>
+            <button type="button" onclick="closeModal()" style="width:100%; margin-top:10px; border:none; background:none; color:#999; cursor:pointer;">Cancelar</button>
         </form>
     </div>
 </div>
@@ -76,8 +81,9 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    // --- CONFIGURAÇÃO JÁ COM SEUS DADOS ---
+    // --- CREDENCIAIS L&M IMPORTS ---
     const firebaseConfig = {
         apiKey: "AIzaSyD1q7f-AOe1brtS1lVyHEjnUamxuLGNtUc",
         authDomain: "lm-imports.firebaseapp.com",
@@ -89,30 +95,66 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     const prodCol = collection(db, "produtos");
 
     let isAdmin = false;
-    window.checkAdmin = () => { if(prompt("Senha:") === "1234") { isAdmin = true; document.getElementById('adminModal').style.display = 'flex'; renderProducts(window.lastSnap); } };
+    window.checkAdmin = () => { if(prompt("Senha L&M:") === "1234") { isAdmin = true; document.getElementById('adminModal').style.display = 'flex'; } };
     window.closeModal = () => document.getElementById('adminModal').style.display = 'none';
 
+    // FUNÇÃO DE UPLOAD PARA O STORAGE
     document.getElementById('productForm').onsubmit = async (e) => {
         e.preventDefault();
-        await addDoc(prodCol, {
-            name: document.getElementById('pName').value,
-            price: document.getElementById('pPrice').value,
-            img: document.getElementById('pImg').value,
-            desc: document.getElementById('pDesc').value,
-            createdAt: Date.now()
-        });
-        closeModal();
-        e.target.reset();
+        const btn = document.getElementById('submitBtn');
+        const file = document.getElementById('pImgFile').files[0];
+        const status = document.getElementById('uploadStatus');
+
+        try {
+            btn.disabled = true;
+            status.innerText = "Subindo imagem... aguarde.";
+            
+            // Cria a referência no Storage
+            const storageRef = ref(storage, `vitrine/${Date.now()}_${file.name}`);
+            
+            // Faz o upload
+            const uploadTask = await uploadBytes(storageRef, file);
+            
+            // Pega o link da foto gerada
+            const url = await getDownloadURL(uploadTask.ref);
+
+            // Salva no banco de dados
+            await addDoc(prodCol, {
+                name: document.getElementById('pName').value,
+                price: document.getElementById('pPrice').value,
+                img: url,
+                path: uploadTask.ref.fullPath, // Guardamos o caminho para deletar depois
+                desc: document.getElementById('pDesc').value,
+                createdAt: Date.now()
+            });
+
+            status.innerText = "Publicado com sucesso!";
+            setTimeout(() => { closeModal(); e.target.reset(); status.innerText = ""; btn.disabled = false; }, 1000);
+        } catch (err) { 
+            console.error(err);
+            alert("Erro ao publicar! Verifique se as regras do Storage no Firebase estão abertas."); 
+            btn.disabled = false;
+            status.innerText = "";
+        }
     };
 
-    window.deleteProd = async (id) => { if(confirm("Excluir?")) await deleteDoc(doc(db, "produtos", id)); };
-    window.toggleDetails = (id) => { const el = document.getElementById(`details-${id}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; };
+    window.deleteProd = async (id, path) => { 
+        if(confirm("Excluir este produto?")) {
+            await deleteDoc(doc(db, "produtos", id));
+            if(path) await deleteObject(ref(storage, path));
+        }
+    };
+
+    window.toggleDetails = (id) => { 
+        const el = document.getElementById(`details-${id}`); 
+        el.style.display = el.style.display === 'block' ? 'none' : 'block'; 
+    };
 
     onSnapshot(query(prodCol, orderBy("createdAt", "desc")), (snap) => {
-        window.lastSnap = snap;
         const grid = document.getElementById('products-grid');
         grid.innerHTML = "";
         snap.forEach(doc => {
@@ -125,11 +167,13 @@
                         <span class="price">${p.price}</span>
                         <div class="actions">
                             <button class="btn btn-details" onclick="toggleDetails('${doc.id}')">Mais detalhes</button>
-                            <a class="btn btn-wa" href="https://wa.me/5511999999999?text=Interesse: ${p.name}" target="_blank">Negociar</a>
+                            <a class="btn btn-wa" href="https://wa.me/5511999999999?text=Olá! Tenho interesse no: ${p.name}" target="_blank">
+                                <i class="fa-brands fa-whatsapp"></i> Negociar
+                            </a>
                         </div>
                     </div>
-                    <div id="details-${doc.id}" class="details-panel">${p.desc}</div>
-                    ${isAdmin ? `<button onclick="deleteProd('${doc.id}')" style="width:100%; border:none; color:red; padding:10px; cursor:pointer;">REMOVER</button>` : ''}
+                    <div id="details-${doc.id}" class="details-panel">${p.desc.replace(/\n/g, '<br>')}</div>
+                    ${isAdmin ? `<button onclick="deleteProd('${doc.id}', '${p.path}')" style="width:100%; border:none; background:#fff5f5; color:red; padding:15px; cursor:pointer; font-weight:bold;">REMOVER PRODUTO</button>` : ''}
                 </div>`;
         });
     });
