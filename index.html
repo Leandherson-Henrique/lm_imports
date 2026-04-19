@@ -1,266 +1,798 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L&M Imports | Vitrine Premium</title>
+    <title>L&M Imports</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <style>
-        :root { --primary: #25d366; --bg: #f8f9fa; --card-bg: #ffffff; --text: #121212; --border: rgba(0,0,0,0.08); }
-        [data-theme="dark"] { --bg: #0f172a; --card-bg: #1e293b; --text: #f8f9fa; --border: rgba(255,255,255,0.1); }
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 100px; min-height: 100vh; }
+        :root {
+            --primary: #25d366;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #121212;
+            --text-alt: #64748b;
+            --border: rgba(0, 0, 0, 0.08);
+        }
 
-        header { background: var(--card-bg); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
-        .logo { font-size: 1.4rem; font-weight: 800; }
-        .logo span { color: var(--primary); }
-        .header-actions { display: flex; gap: 10px; }
-        .btn-icon { background: var(--bg); border: 1px solid var(--border); color: var(--text); width: 40px; height: 40px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        [data-theme="dark"] {
+            --bg: #0b0f1a;
+            --card-bg: #161e2d;
+            --text: #f8f9fa;
+            --text-alt: #94a3b8;
+            --border: rgba(255, 255, 255, 0.05);
+        }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 15px; }
-        #products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        @media (min-width: 768px) { #products-grid { grid-template-columns: repeat(4, 1fr); gap: 25px; } }
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s, color 0.3s;
+        }
 
-        .card { background: var(--card-bg); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); position: relative; display: flex; flex-direction: column; }
-        .media-container { width: 100%; aspect-ratio: 1/1; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; scrollbar-width: none; background: #eee; }
-        .media-container img { min-width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; cursor: zoom-in; }
-        .stock-tag { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: bold; z-index: 10; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        .info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .info h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; height: 34px; overflow: hidden; }
-        .price { font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
-        
-        .btn-wa { background: var(--primary); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-sold-out { background: #666; cursor: not-allowed; }
+        header {
+            background: var(--card-bg);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
 
-        #add-btn-float { display: none; position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; border: none; font-size: 24px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 500; cursor: pointer; }
-        .admin-controls { display: none; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .btn-edit { background: #3b82f6; color: white; border: none; padding: 8px; border-radius: 8px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
-        .btn-del { background: #ef4444; color: white; border: none; padding: 8px; border-radius: 8px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
 
-        #edit-imgs-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .preview-item { position: relative; aspect-ratio: 1/1; border-radius: 10px; overflow: hidden; border: 2px solid var(--border); background: #eee; }
-        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-remove-img { position: absolute; top: 2px; right: 2px; background: #ef4444; color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .logo span {
+            color: var(--primary);
+        }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card-bg); color: var(--text); padding: 25px; border-radius: 25px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
-        .main-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .upload-area { border: 2px dashed var(--border); padding: 15px; text-align: center; border-radius: 15px; margin-bottom: 15px; cursor: pointer; }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 15px 16px 50px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        #products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 768px) {
+            #products-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .media-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            cursor: pointer;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .media-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .media-container img {
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+            z-index: 5;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .dot.active {
+            background: var(--primary);
+            width: 12px;
+            border-radius: 3px;
+        }
+
+        .info {
+            padding: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info h3 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            height: 2.4em;
+            overflow: hidden;
+        }
+
+        .price {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stock-tag {
+            font-size: 0.7rem;
+            color: var(--text-alt);
+        }
+
+        .btn-wa-card {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 800;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            border: none;
+            margin-top: 5px;
+        }
+
+        .btn-details-trigger {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .admin-box {
+            padding: 0 12px 12px;
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        .btn-edit {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        .btn-del {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        /* TELA DETALHES */
+        #product-details-page {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: var(--bg);
+            overflow-y: auto;
+        }
+
+        .details-content {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 40px;
+        }
+
+        .det-gallery-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .det-img-container {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .det-img-container img {
+            min-width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* SETAS DE NAVEGAÇÃO DETALHES */
+        .det-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white !important;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2100;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .det-prev {
+            left: 15px;
+        }
+
+        .det-next {
+            right: 15px;
+        }
+
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightbox-img {
+            max-width: 95%;
+            max-height: 85%;
+            object-fit: contain;
+        }
+
+        .lb-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #add-btn-float,
+        #report-btn {
+            display: none;
+            position: fixed;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            z-index: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #add-btn-float {
+            bottom: 20px;
+            background: var(--primary);
+        }
+
+        #report-btn {
+            bottom: 85px;
+            background: #3b82f6;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .preview-img-container {
+            position: relative;
+            min-width: 70px;
+            height: 70px;
+        }
+
+        .preview-img-container img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .remove-img-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
     </style>
 </head>
+
 <body data-theme="light">
+    <script>
+        // Recupera o tema IMEDIATAMENTE antes de renderizar o resto
+        const savedTheme = localStorage.getItem('lm-theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+    </script>
 
-<header>
-    <div class="logo">L&M <span>Imports</span></div>
-    <div class="header-actions">
-        <button class="btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
-        <button class="btn-icon" id="login-btn" onclick="openLogin()"><i class="fa-solid fa-user-lock"></i></button>
-        <button class="btn-icon" id="logout-btn" onclick="logout()" style="display:none; color:red;"><i class="fa-solid fa-right-from-bracket"></i></button>
+    <header>
+        <div class="logo">L&M <span>Imports</span></div>
+        <div class="header-actions">
+            <button class="btn-icon" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+            <button class="btn-icon" id="login-btn" onclick="openLogin()"><i class="fa-solid fa-user-lock"></i></button>
+            <button class="btn-icon" id="logout-btn" onclick="logout()" style="display:none; color:#ef4444;"><i
+                    class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="productSearch" placeholder="Pesquisar..." oninput="filterProducts()">
+        </div>
     </div>
-</header>
 
-<div class="container"><div id="products-grid"></div></div>
-
-<button id="add-btn-float" onclick="openProductModal()"><i class="fa-solid fa-plus"></i></button>
-
-<div id="loginModal" class="modal">
-    <div class="modal-content">
-        <h3>Painel Admin</h3>
-        <input type="text" id="admUser" placeholder="Usuário" autocomplete="off">
-        <input type="password" id="admPass" placeholder="Senha" autocomplete="off">
-        <button class="main-btn" onclick="handleLogin()">Entrar</button>
-        <button onclick="closeModals()" style="width:100%; margin-top:10px; border:none; background:none; color:var(--text); opacity:0.5;">Fechar</button>
+    <div class="container">
+        <div id="products-grid"></div>
     </div>
-</div>
 
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle" style="margin-bottom:15px">Produto</h3>
-        <form id="productForm">
-            <input type="hidden" id="pId">
-            <input type="text" id="pName" placeholder="Nome do Produto" required>
-            <input type="text" id="pPrice" placeholder="Valor" required onkeyup="formatarMoeda(this)">
-            <input type="number" id="pStock" placeholder="Estoque" required>
-            
-            <div id="media-manager">
-                <p style="font-size:0.75rem; font-weight:bold; margin-bottom:10px;">Imagens Selecionadas:</p>
-                <div id="edit-imgs-preview"></div>
-                <div class="upload-area" onclick="document.getElementById('pImgFiles').click()">
-                    <i class="fa-solid fa-camera" style="font-size: 1.5rem; margin-bottom: 5px;"></i>
-                    <p style="font-size: 0.8rem;">Adicionar Fotos (Até 6)</p>
-                    <input type="file" id="pImgFiles" accept="image/*" multiple style="display:none" onchange="handleFileSelect(this)">
-                </div>
+    <div id="product-details-page">
+        <div class="details-content">
+            <button onclick="closeDetails()"
+                style="position:fixed; top:15px; left:15px; z-index:2200; padding:10px; border-radius:50%; border:none; background:rgba(255,255,255,0.9); cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.2); width:40px; height:40px;"><i
+                    class="fa-solid fa-arrow-left"></i></button>
+
+            <div class="det-gallery-wrapper">
+                <button class="det-nav det-prev" id="btn-prev-det" onclick="moveDetGallery(-1)"><i
+                        class="fa-solid fa-chevron-left"></i></button>
+                <div class="det-img-container" id="det-images"></div>
+                <button class="det-nav det-next" id="btn-next-det" onclick="moveDetGallery(1)"><i
+                        class="fa-solid fa-chevron-right"></i></button>
+                <div class="carousel-dots" id="det-dots"></div>
             </div>
 
-            <textarea id="pDesc" rows="3" placeholder="Descrição (Opcional)"></textarea>
-            <button type="submit" id="submitBtn" class="main-btn">SALVAR</button>
-            <button type="button" onclick="closeModals()" style="width:100%; margin-top:10px; border:none; background:none; color:var(--text); opacity:0.5;">Cancelar</button>
-        </form>
+            <div style="padding: 20px;">
+                <h2 id="det-name" style="font-size: 1.4rem;"></h2>
+                <p id="det-stock" style="color: var(--text-alt); font-size: 0.85rem; margin: 5px 0;"></p>
+                <p id="det-price" style="font-size: 1.6rem; color: var(--primary); font-weight: 800; margin: 10px 0;">
+                </p>
+                <div id="det-desc"
+                    style="white-space: pre-wrap; color: var(--text-alt); line-height: 1.5; font-size: 0.95rem;"></div>
+                <a href="" id="det-wa-link" target="_blank" class="btn-wa-card"
+                    style="margin-top:25px; padding:15px; font-size:0.9rem;"><i class="fa-brands fa-whatsapp"></i>
+                    NEGOCIAR NO WHATSAPP</a>
+            </div>
+        </div>
     </div>
-</div>
 
-<div id="zoomModal" class="modal" onclick="this.style.display='none'"><img id="zoomImg" src="" style="max-width:100%; max-height:100%; object-fit:contain;"></div>
+    <div id="lightbox">
+        <button class="lb-close" onclick="closeLightbox()">&times;</button>
+        <div id="lightbox-content" onclick="if(event.target === this) closeLightbox()">
+            <img id="lightbox-img" src="">
+        </div>
+    </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:15px">Estatísticas</h3>
+            <p id="total-visits-box"
+                style="margin-bottom: 10px; font-weight: 800; color: var(--primary); background: var(--bg); padding: 12px; border-radius: 10px; text-align: center;">
+                Visitas: ...</p>
+            <input type="date" id="report-date-filter" onchange="renderReportContent()">
+            <div id="report-data-area"
+                style="margin: 15px 0; max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="downloadCSV()"
+                    style="flex: 1; padding: 12px; background: #10b981; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">CSV</button>
+                <button onclick="resetStats()"
+                    style="padding: 12px; background: #ef4444; color: white; border: none; border-radius: 10px; cursor: pointer;"><i
+                        class="fa-solid fa-trash"></i></button>
+            </div>
+            <button onclick="closeModals()"
+                style="width: 100%; background: none; border: none; color: var(--text-alt); margin-top: 15px; cursor: pointer;">Fechar</button>
+        </div>
+    </div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyD1q7f-AOe1brtS1lVyHEjnUamxuLGNtUc",
-        authDomain: "lm-imports.firebaseapp.com",
-        projectId: "lm-imports",
-        storageBucket: "lm-imports.firebasestorage.app",
-        messagingSenderId: "354232403670",
-        appId: "1:354232403670:web:a42e289f44d8eb58362b77"
-    };
+    <button id="add-btn-float" onclick="openProductModal()"><i class="fa-solid fa-plus"></i></button>
+    <button id="report-btn" onclick="openReportModal()"><i class="fa-solid fa-chart-line"></i></button>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const prodCol = collection(db, "produtos");
+    <div id="productModal" class="modal">
+        <div class="modal-content" style="max-height: 85vh; overflow-y: auto;">
+            <h3 style="margin-bottom:10px">Produto</h3>
+            <form id="productForm">
+                <input type="hidden" id="pId">
+                <input type="text" id="pName" placeholder="Nome" required>
+                <input type="text" id="pPrice" placeholder="Preço" required onkeyup="formatarMoeda(this)">
+                <input type="number" id="pStock" placeholder="Estoque">
+                <textarea id="pDesc" rows="3" placeholder="Descrição"></textarea>
+                <div id="edit-imgs-preview" style="display:flex; gap:8px; margin:10px 0; overflow-x:auto;"></div>
+                <input type="file" id="pImgFiles" accept="image/*" multiple onchange="handleFileSelect(this)">
+                <button type="submit" id="submitBtn"
+                    style="width:100%; padding:14px; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">SALVAR</button>
+                <button type="button" onclick="closeModals()"
+                    style="width:100%; margin-top:10px; background:none; border:none; cursor:pointer;">Cancelar</button>
+            </form>
+        </div>
+    </div>
 
-    let isAdmin = false;
-    let imagesToSave = [];
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h3>Admin</h3>
+            <input type="text" id="admUser" placeholder="Usuário">
+            <input type="password" id="admPass" placeholder="Senha">
+            <button onclick="handleLogin()"
+                style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer;">Entrar</button>
+            <button onclick="closeModals()"
+                style="width:100%; background:none; border:none; margin-top:10px; cursor:pointer;">Voltar</button>
+        </div>
+    </div>
 
-    window.openLogin = () => {
-        document.getElementById('admUser').value = ""; // Limpa usuário ao abrir
-        document.getElementById('admPass').value = ""; // Limpa senha ao abrir
-        document.getElementById('loginModal').style.display = 'flex';
-    };
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, updateDoc, onSnapshot, deleteDoc, doc, query, orderBy, getDocs, writeBatch, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    window.handleLogin = () => {
-        if(document.getElementById('admUser').value === 'admin' && document.getElementById('admPass').value === 'Nosrednael@77') {
-            isAdmin = true; localStorage.setItem('isL&MAdmin', 'true'); updateAdminUI(); closeModals();
-        } else alert("Acesso Negado!");
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1q7f-AOe1brtS1lVyHEjnUamxuLGNtUc",
+            authDomain: "lm-imports.firebaseapp.com",
+            projectId: "lm-imports",
+            storageBucket: "lm-imports.firebasestorage.app",
+            messagingSenderId: "354232403670",
+            appId: "1:354232403670:web:a42e289f44d8eb58362b77"
+        };
 
-    window.logout = () => { isAdmin = false; localStorage.removeItem('isL&MAdmin'); location.reload(); };
-    window.updateAdminUI = () => {
-        document.getElementById('add-btn-float').style.display = isAdmin ? 'block' : 'none';
-        document.getElementById('login-btn').style.display = isAdmin ? 'none' : 'flex';
-        document.getElementById('logout-btn').style.display = isAdmin ? 'flex' : 'none';
-        renderProducts();
-    };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const prodCol = collection(db, "produtos");
+        const statsCol = collection(db, "estatisticas");
 
-    window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        let isAdmin = localStorage.getItem('isL&MAdmin') === 'true';
+        let imagesToSave = [];
+        let carouselIntervals = {};
+        let currentDetIdx = 0;
+        let currentDetImgsCount = 0;
 
-    window.handleFileSelect = (input) => {
-        const files = Array.from(input.files);
-        if(imagesToSave.length + files.length > 6) return alert("Máximo de 6 fotos!");
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => { imagesToSave.push({ file: file, url: e.target.result }); renderImgPreview(); };
-            reader.readAsDataURL(file);
+        // TEMA
+        window.toggleTheme = () => {
+            const current = document.body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('lm-theme', next);
+        };
+
+        // VISITAS
+        async function updateVisits() {
+            const vRef = doc(db, "metadata", "visitas");
+            await updateDoc(vRef, { count: increment(1) }).catch(async () => {
+                await setDoc(vRef, { count: 1 });
+            });
+        }
+        onSnapshot(doc(db, "metadata", "visitas"), (d) => {
+            if (d.exists()) document.getElementById('total-visits-box').innerText = `Visitas Totais: ${d.data().count}`;
         });
-        input.value = "";
-    };
+        updateVisits();
 
-    window.renderImgPreview = () => {
-        const container = document.getElementById('edit-imgs-preview');
-        container.innerHTML = imagesToSave.map((img, idx) => `
-            <div class="preview-item">
-                <img src="${img.url}">
-                <button type="button" class="btn-remove-img" onclick="removeImg(${idx})">×</button>
-            </div>
-        `).join('');
-    };
+        function startCarousels() {
+            Object.values(carouselIntervals).forEach(clearInterval);
+            document.querySelectorAll('.card').forEach((card, idx) => {
+                const container = card.querySelector('.media-container');
+                const dots = card.querySelectorAll('.dot');
+                const total = container.querySelectorAll('img').length;
+                if (total <= 1) return;
+                let current = 0;
+                carouselIntervals[idx] = setInterval(() => {
+                    current = (current + 1) % total;
+                    container.style.transform = `translateX(-${current * 100}%)`;
+                    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                }, 4000);
+            });
+        }
 
-    window.removeImg = (idx) => { imagesToSave.splice(idx, 1); renderImgPreview(); };
-
-    window.openProductModal = (data = null) => {
-        const f = document.getElementById('productForm');
-        f.reset();
-        imagesToSave = data ? (data.images || []).map(url => ({ file: null, url })) : [];
-        document.getElementById('pId').value = data ? data.id : "";
-        document.getElementById('pName').value = data ? data.name : "";
-        document.getElementById('pPrice').value = data ? data.price : "R$ ";
-        document.getElementById('pStock').value = data ? data.stock : "";
-        document.getElementById('pDesc').value = data ? data.desc : "";
-        renderImgPreview();
-        document.getElementById('productModal').style.display = 'flex';
-    };
-
-    document.getElementById('productForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        const id = document.getElementById('pId').value;
-        btn.disabled = true; btn.innerText = "Sincronizando...";
-        try {
-            const finalUrls = [];
-            for(let item of imagesToSave) {
-                if(item.file) {
-                    const sRef = ref(storage, `vitrine/${Date.now()}_${item.file.name}`);
-                    const snap = await uploadBytes(sRef, item.file);
-                    finalUrls.push(await getDownloadURL(snap.ref));
-                } else { finalUrls.push(item.url); }
-            }
-            const pData = {
-                name: document.getElementById('pName').value,
-                price: document.getElementById('pPrice').value,
-                stock: parseInt(document.getElementById('pStock').value),
-                desc: document.getElementById('pDesc').value,
-                images: finalUrls,
-                updatedAt: Date.now()
-            };
-            if(id) await updateDoc(doc(db, "produtos", id), pData);
-            else { pData.createdAt = Date.now(); await addDoc(prodCol, pData); }
-            closeModals();
-        } catch (err) { alert("Erro ao salvar!"); }
-        btn.disabled = false; btn.innerText = "SALVAR";
-    };
-
-    let currentProds = [];
-    onSnapshot(query(prodCol, orderBy("createdAt", "desc")), (snap) => {
-        currentProds = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        renderProducts();
-    });
-
-    function renderProducts() {
-        const grid = document.getElementById('products-grid');
-        grid.innerHTML = "";
-        currentProds.forEach(p => {
-            const isOut = p.stock <= 0;
-            const imgs = (p.images || []).map(i => `<img src="${i}" onclick="openZoom('${i}')">`).join('');
-            grid.innerHTML += `
-                <div class="card">
-                    <span class="stock-tag">${isOut ? 'ESGOTADO' : 'Estoque: '+p.stock}</span>
-                    <div class="media-container">${imgs}</div>
-                    <div class="info">
+        onSnapshot(query(prodCol, orderBy("createdAt", "desc")), (snap) => {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = "";
+            snap.forEach(docSnap => {
+                const p = { id: docSnap.id, ...docSnap.data() };
+                const pJson = JSON.stringify(p).replace(/'/g, "&apos;");
+                grid.innerHTML += `
+    <div class="card" data-name="${p.name.toLowerCase()}">
+        <div class="media-wrapper" onclick='openDetails(${pJson})'>
+            <div class="media-container">${p.images.map(img => `<img src="${img}">`).join('')}</div>
+            <div class="carousel-dots">${p.images.map((_, i) => `<div class="dot ${i === 0 ? 'active' : ''}"></div>`).join('')}</div>
+        </div>
+        <div class="info">
                         <h3>${p.name}</h3>
+                        <p class="stock-tag">Estoque: ${p.stock || 0}</p>
                         <p class="price">${p.price}</p>
-                        ${isOut ? 
-                            `<span class="btn-wa btn-sold-out">ESGOTADO</span>` : 
-                            `<a class="btn-wa" href="https://wa.me/5581984304478?text=Olá! Gostaria de negociar o produto: ${p.name}" target="_blank">
-                                <i class="fa-brands fa-whatsapp"></i> NEGOCIAR
-                            </a>`
-                        }
-                        <div class="admin-controls" style="display: ${isAdmin ? 'grid' : 'none'}">
-                            <button class="btn-edit" onclick='openProductModal(${JSON.stringify(p).replace(/'/g, "&apos;")})'>EDITAR</button>
-                            <button class="btn-del" onclick="confirm('Excluir?') && deleteDoc(doc(db,'produtos','${p.id}'))">APAGAR</button>
-                        </div>
+                        <button class="btn-details-trigger" onclick='openDetails(${pJson})'>Ver Detalhes</button>
+                        <a href="https://wa.me/5581984304478?text=Olá, interesse no ${p.name}" target="_blank" class="btn-wa-card" onclick="logClick('${p.name}')">
+                            <i class="fa-brands fa-whatsapp"></i> Negociar
+                        </a>
+                    </div>
+                    <div class="admin-box" style="display: ${isAdmin ? 'grid' : 'none'}">
+                        <button class="btn-edit" onclick='openProductModal(${pJson})'>EDITAR</button>
+                        <button class="btn-del" onclick="confirm('Excluir?') && deleteDoc(doc(db,'produtos','${p.id}'))">APAGAR</button>
                     </div>
                 </div>`;
+            });
+            setTimeout(startCarousels, 500);
+            updateAdminUI();
         });
-    }
 
-    window.formatarMoeda = (i) => {
-        let v = i.value.replace(/\D/g,'');
-        v = (v/100).toFixed(2).replace(".",",");
-        v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
-        i.value = "R$ " + v;
-    };
-    window.toggleTheme = () => {
-        const b = document.body; const isDark = b.getAttribute('data-theme') === 'dark';
-        b.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
-    };
-    if(localStorage.getItem('theme') === 'dark') toggleTheme();
-    if(localStorage.getItem('isL&MAdmin') === 'true') { isAdmin = true; updateAdminUI(); }
-    window.openZoom = (src) => { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; };
-</script>
+        // DETALHES
+        window.openDetails = (p) => {
+            logClick(p.name);
+            currentDetImgsCount = p.images.length;
+            currentDetIdx = 0;
+            document.getElementById('product-details-page').style.display = 'block';
+            document.getElementById('det-name').innerText = p.name;
+            document.getElementById('det-price').innerText = p.price;
+            document.getElementById('det-stock').innerText = `Estoque disponível: ${p.stock || 0} unidades`;
+            document.getElementById('det-desc').innerText = p.desc;
+            document.getElementById('det-wa-link').href = `https://wa.me/5581984304478?text=Vi no site: ${p.name}`;
+
+            const container = document.getElementById('det-images');
+            container.innerHTML = p.images.map(img => `<img src="${img}" onclick="openLightbox('${img}')">`).join('');
+
+            const dots = document.getElementById('det-dots');
+            dots.innerHTML = p.images.map((_, i) => `<div class="dot ${i === 0 ? 'active' : ''}"></div>`).join('');
+
+            updateDetGalleryPos();
+        };
+
+        window.moveDetGallery = (dir) => {
+            if (currentDetImgsCount <= 1) return;
+            currentDetIdx = (currentDetIdx + dir + currentDetImgsCount) % currentDetImgsCount;
+            updateDetGalleryPos();
+        };
+
+        function updateDetGalleryPos() {
+            const container = document.getElementById('det-images');
+            container.style.transform = `translateX(-${currentDetIdx * 100}%)`;
+            const dots = document.querySelectorAll('#det-dots .dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === currentDetIdx));
+            const show = currentDetImgsCount > 1 ? 'flex' : 'none';
+            document.getElementById('btn-prev-det').style.display = show;
+            document.getElementById('btn-next-det').style.display = show;
+        }
+
+        window.closeDetails = () => document.getElementById('product-details-page').style.display = 'none';
+        window.openLightbox = (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; };
+        window.closeLightbox = () => document.getElementById('lightbox').style.display = 'none';
+
+        window.logClick = (name) => addDoc(statsCol, { product: name, date: new Date().toISOString().split('T')[0] });
+
+        window.openReportModal = () => {
+            document.getElementById('report-date-filter').value = new Date().toISOString().split('T')[0];
+            document.getElementById('reportModal').style.display = 'flex';
+            renderReportContent();
+        };
+
+        window.renderReportContent = async () => {
+            const date = document.getElementById('report-date-filter').value;
+            const area = document.getElementById('report-data-area');
+            const snap = await getDocs(statsCol);
+            let clicks = {};
+            snap.forEach(d => { if (d.data().date === date) clicks[d.data().product] = (clicks[d.data().product] || 0) + 1; });
+            const sorted = Object.entries(clicks).sort((a, b) => b[1] - a[1]);
+            area.innerHTML = sorted.length ? sorted.map(([n, c]) => `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid var(--border); font-size:13px;"><span>${n}</span><strong>${c} clicks</strong></div>`).join('') : '<p style="padding:10px; font-size:13px;">Sem dados.</p>';
+        };
+
+        window.downloadCSV = async () => {
+            const date = document.getElementById('report-date-filter').value;
+            const snap = await getDocs(statsCol);
+            let csv = "Produto,Cliques,Data\n";
+            let counts = {};
+            snap.forEach(d => { if (d.data().date === date) counts[d.data().product] = (counts[d.data().product] || 0) + 1; });
+            Object.entries(counts).forEach(([n, c]) => csv += `${n},${c},${date}\n`);
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `relatorio.csv`; a.click();
+        };
+
+        window.resetStats = async () => { if (confirm("Zerar?")) { const snap = await getDocs(statsCol); const batch = writeBatch(db); snap.forEach(d => batch.delete(d.ref)); await batch.commit(); renderReportContent(); } };
+
+        window.openProductModal = (data = null) => {
+            document.getElementById('productForm').reset();
+            imagesToSave = data ? data.images.map(url => ({ file: null, url })) : [];
+            document.getElementById('pId').value = data ? data.id : "";
+            document.getElementById('pName').value = data ? data.name : "";
+            document.getElementById('pPrice').value = data ? data.price : "R$ ";
+            document.getElementById('pStock').value = data ? data.stock : "";
+            document.getElementById('pDesc').value = data ? data.desc : "";
+            renderImgPreview();
+            document.getElementById('productModal').style.display = 'flex';
+        };
+
+        window.handleFileSelect = (input) => {
+            Array.from(input.files).forEach(file => {
+                const r = new FileReader(); r.onload = (e) => { imagesToSave.push({ file: file, url: e.target.result }); renderImgPreview(); }; r.readAsDataURL(file);
+            });
+        };
+        window.renderImgPreview = () => {
+            document.getElementById('edit-imgs-preview').innerHTML = imagesToSave.map((img, idx) => `
+            <div class="preview-img-container"><img src="${img.url}"><button type="button" class="remove-img-btn" onclick="imagesToSave.splice(${idx},1);renderImgPreview();">&times;</button></div>
+        `).join('');
+        };
+
+        document.getElementById('productForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn'); btn.disabled = true; btn.innerText = "A aguardar...";
+            const urls = [];
+            for (let item of imagesToSave) {
+                if (item.file) {
+                    const sRef = ref(storage, `vitrine/${Date.now()}_${item.file.name}`);
+                    const snap = await uploadBytes(sRef, item.file);
+                    urls.push(await getDownloadURL(snap.ref));
+                } else urls.push(item.url);
+            }
+            const pData = { name: document.getElementById('pName').value, price: document.getElementById('pPrice').value, stock: parseInt(document.getElementById('pStock').value) || 0, desc: document.getElementById('pDesc').value, images: urls, updatedAt: Date.now() };
+            const id = document.getElementById('pId').value;
+            if (id) await updateDoc(doc(db, "produtos", id), pData); else { pData.createdAt = Date.now(); await addDoc(prodCol, pData); }
+            closeModals(); btn.disabled = false; btn.innerText = "SALVAR";
+        };
+
+        window.handleLogin = () => {
+            if (document.getElementById('admUser').value === 'admin' && document.getElementById('admPass').value === 'Nosrednael@77') {
+                isAdmin = true; localStorage.setItem('isL&MAdmin', 'true'); updateAdminUI(); closeModals();
+            } else alert("Incorreto");
+        };
+        window.logout = () => { isAdmin = false; localStorage.removeItem('isL&MAdmin'); location.reload(); };
+        window.updateAdminUI = () => {
+            const d = isAdmin ? 'block' : 'none';
+            document.getElementById('add-btn-float').style.display = d;
+            document.getElementById('report-btn').style.display = d;
+            document.getElementById('login-btn').style.display = isAdmin ? 'none' : 'flex';
+            document.getElementById('logout-btn').style.display = isAdmin ? 'flex' : 'none';
+            document.querySelectorAll('.admin-box').forEach(el => el.style.display = isAdmin ? 'grid' : 'none');
+        };
+        window.formatarMoeda = (i) => { let v = i.value.replace(/\D/g, ''); v = (v / 100).toFixed(2).replace(".", ","); i.value = "R$ " + v.replace(/(\d)(\d{3}),/g, "$1.$2,"); };
+        window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        window.openLogin = () => document.getElementById('loginModal').style.display = 'flex';
+        window.filterProducts = () => {
+            const q = document.getElementById('productSearch').value.toLowerCase();
+            document.querySelectorAll('.card').forEach(card => card.style.display = card.dataset.name.includes(q) ? 'flex' : 'none');
+        };
+        updateAdminUI();
+    </script>
 </body>
+
 </html>
